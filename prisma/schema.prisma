@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users{
+  id String @id @default(uuid())
+  email String @unique
+  name String?
+  password String
+  address String
+  phoneNumber String
+  orders Orders[] 
+  orderItems OrderItems[]
+  cart Cart[]
+  review Reviews[]
+}
+
+model Products{
+  id String @id @default(uuid())
+  name String
+  description String
+  price Int
+  quantityAvailable Int
+  category String
+  ImageURL String
+  orderItems OrderItems[]
+  cart Cart[]
+  review Reviews[]
+}
+
+model Orders{
+  id String @id @default(uuid())
+  customer Users @relation(fields: [customerId],references: [id])
+  customerId String
+  orderDate DateTime
+  orderStatus String
+  totalPrice Int
+  shippingAddress String
+  payments Payments[]
+}
+
+model OrderItems{
+  id String @id @default(uuid())
+  customer Users @relation(fields: [customerId],references: [id])
+  customerId String
+  product Products @relation(fields: [productId],references: [id])
+  productId String
+  quantity Int
+  price Int
+}
+
+model Payments{
+  id  String @id @default(uuid())
+  orders Orders @relation(fields: [orderId],references: [id])
+  orderId String
+  paymentDate DateTime
+  paymentStatus String
+  amount Int
+}
+
+model Cart{
+  id String @id @default(uuid())
+  customer Users @relation(fields: [customerId],references: [id])
+  customerId String
+  product Products @relation(fields: [productId],references: [id])
+  productId String
+  quantity Int
+}
+
+model Reviews{
+  id String @id @default(uuid())
+  products Products @relation(fields: [productId],references: [id])
+  productId String
+  customer Users @relation(fields: [customerId],references: [id])
+  customerId String
+  rating Int
+  reviewText String
+  reviewDate DateTime
+}
+
+model Categories{
+  id String @id @default(uuid())
+  name String
+  description String
+}
+
